@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"syscall"
 )
 
 const (
@@ -35,8 +34,8 @@ func extractChart(r io.Reader, chartPath, outputDir string) error {
 	// 0755/0644 requested below. Zeroing the umask for the duration of
 	// extraction makes the requested modes apply exactly, regardless of the
 	// caller's environment, without needing to chmod anything after the fact.
-	oldUmask := syscall.Umask(0)
-	defer syscall.Umask(oldUmask)
+	// Platforms without a umask (e.g. Windows) make this a no-op.
+	defer clearUmask()()
 
 	gz, err := gzip.NewReader(r)
 	if err != nil {

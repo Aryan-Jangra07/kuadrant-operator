@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -103,6 +104,10 @@ func TestSyncOne_MissingChartDirectory(t *testing.T) {
 		t.Fatalf("expected chart to be downloaded to %s: %v", chartDir, err)
 	}
 
+	// Windows has no Unix permission bits, so there is nothing to assert there.
+	if runtime.GOOS == "windows" {
+		return
+	}
 	info, err := os.Stat(chartDir)
 	if err != nil {
 		t.Fatalf("stat chart dir: %v", err)
